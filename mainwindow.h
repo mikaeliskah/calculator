@@ -23,6 +23,7 @@ private slots:
     void digitClicked();
     void decimalClicked();
     void signClicked();
+    void mathOperationClicked();
 
 };
 #endif // MAINWINDOW_H
