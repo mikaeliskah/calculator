@@ -21,6 +21,8 @@ private:
 
 private slots:
     void digitClicked();
+    void decimalClicked();
+    void signClicked();
 
 };
 #endif // MAINWINDOW_H
