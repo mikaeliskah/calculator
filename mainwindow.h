@@ -24,6 +24,7 @@ private slots:
     void decimalClicked();
     void signClicked();
     void mathOperationClicked();
-
+    void resultClicked();
+    void displayNumber(double number);
 };
 #endif // MAINWINDOW_H

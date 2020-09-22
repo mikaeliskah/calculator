@@ -2,9 +2,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-double firstCalcNumber;
+double firstCalcNumber, secondCalcNumber = 0;
 QString mathOperation;
 bool secondNumberEntry = false;
+bool mathOpWasClicked = false;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -29,8 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_12, &QPushButton::clicked, this, &MainWindow::mathOperationClicked);
     connect(ui->pushButton_13, &QPushButton::clicked, this, &MainWindow::mathOperationClicked);
     connect(ui->pushButton_14, &QPushButton::clicked, this, &MainWindow::mathOperationClicked);
-
-
+    connect(ui->pushButton_21, &QPushButton::clicked, this, &MainWindow::resultClicked);
 }
 
 MainWindow::~MainWindow()
@@ -45,42 +45,29 @@ void MainWindow::digitClicked()
 {
     double labelNumber=0;
     QString labelString;
+
     qDebug() << "a digit was clicked";
 
+    if (mathOpWasClicked == true)
+    {
+        ui->label->setText(""); // clear text one if a math op was clicked previously
+        mathOpWasClicked = false;
+    }
     // check out which button was cliked
     QPushButton* digitButton = (QPushButton*)sender();
 
-
-
     if (ui->label->text().contains('.') && (digitButton->text() == "0"))
     {
-        //in case of trailing zeros, just update the string not the acutal number
+        //in case of trailing zeros, just update the string but not the acutal number
         qDebug() << "zero was clicked after decimal point";
-        labelString = ui->label->text() + "0";
+        ui->label->setText(ui->label->text() + "0");
     }
     else
     {
-        if (!secondNumberEntry)
-        {
-            // first number is being entered
-            // append digit and convert to number
-            labelNumber = (ui->label->text() + digitButton->text()).toDouble();
-            firstCalcNumber = labelNumber;
-        }
-        else if (mathOperation == "+")
-        {
-            // second number is entered
-            labelNumber = firstCalcNumber + (digitButton->text()).toDouble();
-            firstCalcNumber = labelNumber; //update firstCalcNuber to current number
 
-            // TODO this aint workin. it just allos a single digit to be added, nu eg 56 or 77 !!
-            secondNumberEntry =false;
-        }
-        labelString = QString::number(labelNumber,'g',15);
+    labelNumber = (ui->label->text() + digitButton->text()).toDouble();
+    displayNumber(labelNumber);
     }
-    ui->label->setText(labelString);
-
-
 }
 
 
@@ -90,7 +77,6 @@ void MainWindow::digitClicked()
 /*------------------------------------*/
 void MainWindow::decimalClicked()
 {
-
     qDebug() << "decimal was clicked";
     // get current text and update label with current text + decimal point
     ui->label->setText(ui->label->text()  + ".");
@@ -117,20 +103,69 @@ void MainWindow::signClicked()
 
 
 /*------------------------------------*/
-/*   -- math Operation Clicked  --    */
+/*  -- math operation Clicked  --     */
 /*------------------------------------*/
 void MainWindow::mathOperationClicked()
 {
     qDebug() << "math Op was clicked";
+    // remember first calc number
+    if (!secondNumberEntry)
+    {
+        firstCalcNumber = (ui->label->text()).toDouble();
+    }
+    else
+    {
+        secondCalcNumber = (ui->label->text()).toDouble();
+    }
+    // clear display
+    ui->label->setText("0");
 
-    // check which button was clicked
+
+    // check which operation was clicked
     QPushButton* digitButton = (QPushButton*)sender();
-
+    double labelNumber;
     if (digitButton->text() == "+")
     {
         mathOperation = "+";
+        qDebug() << "adding ...";
+        labelNumber = firstCalcNumber + secondCalcNumber;
+        displayNumber(labelNumber);
+        // update first calc number
+        firstCalcNumber = labelNumber;
     }
 
-    // after this the second number will be entered
     secondNumberEntry = true;
+    mathOpWasClicked = true;
+
 }
+
+
+/*------------------------------------*/
+/*        -- result Clicked  --       */
+/*------------------------------------*/
+void MainWindow::resultClicked()
+{
+    double labelNumber;
+
+    qDebug() << "result clicked ... ";
+
+    if (mathOperation == "+")
+    {
+        labelNumber = firstCalcNumber + secondCalcNumber;
+        displayNumber(labelNumber);
+        firstCalcNumber = labelNumber;
+    }
+
+}
+
+
+
+void MainWindow::displayNumber(double number)
+{
+    QString labelString;
+    qDebug() << "displaying " << number;
+    labelString = QString::number(number,'g',15);
+    ui->label->setText(labelString);
+
+}
+
