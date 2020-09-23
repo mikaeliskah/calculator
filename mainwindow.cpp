@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->pushButton_13, &QPushButton::clicked, this, &MainWindow::mathOperationClicked);
     connect(ui->pushButton_14, &QPushButton::clicked, this, &MainWindow::mathOperationClicked);
     connect(ui->pushButton_21, &QPushButton::clicked, this, &MainWindow::resultClicked);
+
+    connect(ui->pushButton_16, &QPushButton::clicked, this, &MainWindow::clearDisplay);
 }
 
 MainWindow::~MainWindow()
@@ -53,20 +55,31 @@ void MainWindow::digitClicked()
         ui->label->setText(""); // clear text one if a math op was clicked previously
         mathOpWasClicked = false;
     }
+
+
     // check out which button was cliked
     QPushButton* digitButton = (QPushButton*)sender();
 
+    // check if zero was clicked after comma
     if (ui->label->text().contains('.') && (digitButton->text() == "0"))
     {
-        //in case of trailing zeros, just update the string but not the acutal number
         qDebug() << "zero was clicked after decimal point";
         ui->label->setText(ui->label->text() + "0");
     }
     else
     {
+        labelNumber = (ui->label->text() + digitButton->text()).toDouble();
+        displayNumber(labelNumber);
+    }
 
-    labelNumber = (ui->label->text() + digitButton->text()).toDouble();
-    displayNumber(labelNumber);
+    // remember first calc number
+    if (!secondNumberEntry)
+    {
+        firstCalcNumber = (ui->label->text()).toDouble();
+    }
+    else
+    {
+        secondCalcNumber = (ui->label->text()).toDouble();
     }
 }
 
@@ -108,15 +121,7 @@ void MainWindow::signClicked()
 void MainWindow::mathOperationClicked()
 {
     qDebug() << "math Op was clicked";
-    // remember first calc number
-    if (!secondNumberEntry)
-    {
-        firstCalcNumber = (ui->label->text()).toDouble();
-    }
-    else
-    {
-        secondCalcNumber = (ui->label->text()).toDouble();
-    }
+
     // clear display
     ui->label->setText("0");
 
@@ -136,7 +141,6 @@ void MainWindow::mathOperationClicked()
 
     secondNumberEntry = true;
     mathOpWasClicked = true;
-
 }
 
 
@@ -154,8 +158,8 @@ void MainWindow::resultClicked()
         labelNumber = firstCalcNumber + secondCalcNumber;
         displayNumber(labelNumber);
         firstCalcNumber = labelNumber;
+        secondCalcNumber = 0;
     }
-
 }
 
 
@@ -166,6 +170,19 @@ void MainWindow::displayNumber(double number)
     qDebug() << "displaying " << number;
     labelString = QString::number(number,'g',15);
     ui->label->setText(labelString);
-
 }
+
+void MainWindow::clearDisplay()
+{
+    qDebug() << "clear display";
+    firstCalcNumber = 0;
+    secondCalcNumber = 0;
+    mathOperation = "";
+    secondNumberEntry = false;
+    mathOpWasClicked = false;
+    ui->label->setText("0");
+}
+
+
+
 
