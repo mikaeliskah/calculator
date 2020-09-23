@@ -107,10 +107,15 @@ void MainWindow::signClicked()
 
     qDebug() << "sign was clicked";
 
-    labelNumber = (ui->label->text()).toDouble();           // this number display function is always the same!
+    labelNumber = (ui->label->text()).toDouble();
     newLabelNumber = labelNumber * -1;
     labelString = QString::number(newLabelNumber,'g',15);
     ui->label->setText(labelString);
+
+    if(secondNumberEntry)
+        secondCalcNumber = newLabelNumber;
+    else
+        firstCalcNumber = newLabelNumber;
 
 }
 
@@ -127,9 +132,10 @@ void MainWindow::mathOperationClicked()
 
 
     // check which operation was clicked
-    QPushButton* digitButton = (QPushButton*)sender();
+    QPushButton* operationButton = (QPushButton*)sender();
     double labelNumber;
-    if (digitButton->text() == "+")
+
+    if (operationButton->text() == "+")
     {
         mathOperation = "+";
         qDebug() << "adding ...";
@@ -138,6 +144,41 @@ void MainWindow::mathOperationClicked()
         // update first calc number
         firstCalcNumber = labelNumber;
     }
+
+    if (operationButton->text() == "-")
+    {
+        mathOperation = "-";
+        qDebug() << "subtract ...";
+        labelNumber = firstCalcNumber - secondCalcNumber;
+        displayNumber(labelNumber);
+        firstCalcNumber = labelNumber;
+    }
+
+    if (operationButton->text() == "*")
+    {
+        mathOperation = "*";
+        qDebug() << "multiplying ...";
+        if(secondNumberEntry)
+            labelNumber = firstCalcNumber * secondCalcNumber;
+        else
+            labelNumber = firstCalcNumber;
+        displayNumber(labelNumber);
+        firstCalcNumber = labelNumber;
+    }
+
+    if (operationButton->text() == "/")
+    {
+        mathOperation = "/";
+        qDebug() << "dividing ...";
+        if(secondNumberEntry)
+            labelNumber = firstCalcNumber / secondCalcNumber; // T O D O: div/0  !!
+        else
+            labelNumber = firstCalcNumber;
+        displayNumber(labelNumber);
+        firstCalcNumber = labelNumber;
+    }
+
+
 
     secondNumberEntry = true;
     mathOpWasClicked = true;
@@ -156,14 +197,33 @@ void MainWindow::resultClicked()
     if (mathOperation == "+")
     {
         labelNumber = firstCalcNumber + secondCalcNumber;
-        displayNumber(labelNumber);
-        firstCalcNumber = labelNumber;
-        secondCalcNumber = 0;
     }
+
+    if (mathOperation == "-")
+    {
+        labelNumber = firstCalcNumber - secondCalcNumber;
+    }
+
+    if (mathOperation == "*")
+    {
+        labelNumber = firstCalcNumber * secondCalcNumber;
+    }
+
+    if (mathOperation == "/")
+    {
+        labelNumber = firstCalcNumber / secondCalcNumber;
+    }
+
+    displayNumber(labelNumber);
+    firstCalcNumber = labelNumber;
+    secondCalcNumber = 0;
+    secondNumberEntry = false;
 }
 
 
-
+/*------------------------------------*/
+/*        -- display number  --       */
+/*------------------------------------*/
 void MainWindow::displayNumber(double number)
 {
     QString labelString;
@@ -172,6 +232,10 @@ void MainWindow::displayNumber(double number)
     ui->label->setText(labelString);
 }
 
+
+/*------------------------------------*/
+/*        -- clear Display  --        */
+/*------------------------------------*/
 void MainWindow::clearDisplay()
 {
     qDebug() << "clear display";
