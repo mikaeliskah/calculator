@@ -24,7 +24,7 @@ private slots:
     void decimalClicked();
     void signClicked();
     void mathOperationClicked();
-    void resultClicked();
+    //void resultClicked();
     void displayNumber(double number);
     void clearDisplay();
 };

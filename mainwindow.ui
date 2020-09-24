@@ -370,6 +370,12 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuhans">
+    <property name="title">
+     <string>hans</string>
+    </property>
+   </widget>
+   <addaction name="menuhans"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
